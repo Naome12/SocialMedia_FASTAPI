@@ -3,7 +3,6 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime, date
 from typing import Optional, List
 
-# Base schema for shared fields
 class UserBase(BaseModel):
     username: str
     email: EmailStr
@@ -11,12 +10,14 @@ class UserBase(BaseModel):
     profile_picture: Optional[str] = None
     Dob: date
 
-
-# Schema for creating a new user
 class UserCreate(UserBase):
-    password: str  # Only needed for user creation
+    password: str  
 
-# Schema for response (when sending user data back to client)
+class UsernameResponse(BaseModel):
+    username: str
+    class Config:
+        orm_mode = True
+
 class UserResponse(UserBase):
     username:str
     id: int
@@ -27,8 +28,6 @@ class UserResponse(UserBase):
     class Config:
         from_attributes = True
 
-
-# Schema for user with posts and comments (optional)
 class UserWithPostsAndComments(UserResponse):
     posts: List["PostResponse"] = []
     comments: List["CommentResponse"] = []
@@ -39,3 +38,11 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     bio: Optional[str] = None
     profile_picture: Optional[str] = None
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

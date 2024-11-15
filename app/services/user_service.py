@@ -50,7 +50,7 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[
     if user_update.bio is not None:
         user.bio = user_update.bio
     if user_update.profile_picture is not None:
-        user.profile_picture = user_update.profile_picture
+        user.profile_picture = user_update.profile_picture  
     if user_update.password is not None:
         user.hashed_password = get_password_hash(user_update.password)  # Re-hash new password
     db.commit()
