@@ -7,7 +7,10 @@ from typing import Optional, List
 class UserBase(BaseModel):
     username: str
     email: EmailStr
+    bio: Optional[str] = None
+    profile_picture: Optional[str] = None
     Dob: date
+
 
 # Schema for creating a new user
 class UserCreate(UserBase):
@@ -15,13 +18,15 @@ class UserCreate(UserBase):
 
 # Schema for response (when sending user data back to client)
 class UserResponse(UserBase):
+    username:str
     id: int
     bio: Optional[str] = None
     profile_picture: Optional[str] = None
     created_at: datetime
 
     class Config:
-        orm_mode = True  # To allow SQLAlchemy models to be used with Pydantic schemas
+        from_attributes = True
+
 
 # Schema for user with posts and comments (optional)
 class UserWithPostsAndComments(UserResponse):

@@ -19,4 +19,3 @@ class Comment(Base):
     # Relationships (assuming User and Post models are in `users.py` and `posts.py` respectively)
     user = relationship("User", back_populates="comments")
     post = relationship("Post", back_populates="comments")
-    comments = relationship("Comment", back_populates="user")
