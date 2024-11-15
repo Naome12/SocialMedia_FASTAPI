@@ -1,10 +1,12 @@
 # app/services/user_service.py
-
+from app.models import followers
 from sqlalchemy.orm import Session
 from app.models.Users import User
 from app.schemas.User import UserCreate, UserUpdate
 from typing import Optional
 from passlib.context import CryptContext
+from app.models.followers import Followers as followers
+from sqlalchemy import select
 
 # Initialize Passlib's bcrypt context for hashing passwords
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -65,3 +67,35 @@ def delete_user(db: Session, user_id: int) -> bool:
         db.commit()
         return True
     return False
+
+def follow_user(db: Session, current_user_id: int, user_to_follow_id: int):
+    # Check if the user is already following the target user
+    stmt = select(followers).filter(
+        followers.c.follower_id == current_user_id,
+        followers.c.following_id == user_to_follow_id
+    )
+    existing_follow = db.execute(stmt).first()  # Executes the query and checks if already following
+    if existing_follow:
+        return {"message": "You are already following this user."}
+
+    # If not already following, insert the new follow relationship
+    insert_stmt = followers.insert().values(follower_id=current_user_id, following_id=user_to_follow_id)
+    db.execute(insert_stmt)
+    db.commit()
+    
+    return {"message": "You are now following this user."}
+
+def unfollow_user(db: Session, current_user_id: int, user_to_unfollow_id: int) -> str:
+    if current_user_id == user_to_unfollow_id:
+        raise HTTPException(status_code=400, detail="You cannot unfollow yourself.")
+    
+    user_to_unfollow = db.query(User).filter(User.id == user_to_unfollow_id).first()
+    if not user_to_unfollow:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    db.execute(followers.delete().where(
+        followers.c.follower_id == current_user_id,
+        followers.c.following_id == user_to_unfollow_id
+    ))
+    db.commit()
+    return f"You have unfollowed {user_to_unfollow.username}."

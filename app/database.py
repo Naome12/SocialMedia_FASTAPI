@@ -23,4 +23,5 @@ def init_db():
     import app.models.Users
     import app.models.Posts
     import app.models.Comments
+    import app.models.followers
     Base.metadata.create_all(bind=engine)

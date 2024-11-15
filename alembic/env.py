@@ -2,7 +2,7 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from app.models import Users, Posts, Comments  # Import your models
+from app.models import Users, Posts, Comments,followers  # Import your models
 from app.database import Base  # Make sure to import Base from your database file
 
 # Load the configuration file for logging
