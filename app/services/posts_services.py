@@ -5,7 +5,6 @@ from fastapi import HTTPException
 import logging
 from typing import List, Optional
 
-# Initialize logging
 logger = logging.getLogger(__name__)
 
 def get_post(db: Session, post_id: int) -> Optional[Post]:

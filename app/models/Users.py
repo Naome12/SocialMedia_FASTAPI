@@ -17,11 +17,9 @@ class User(Base):
     bio = Column(String, nullable=True)
     profile_picture = Column(String, nullable=True)
 
-    # Relationships
     posts = relationship("Post", back_populates="user")
     comments = relationship("Comment", back_populates="user")
 
-    # Followers relationship
     followers = relationship(
         "User",
         secondary=Followers,  # Reference the followers table
