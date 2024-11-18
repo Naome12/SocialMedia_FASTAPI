@@ -8,21 +8,19 @@ from passlib.context import CryptContext
 from app.models.followers import Followers as followers
 from sqlalchemy import select
 
-# Initialize Passlib's bcrypt context for hashing passwords
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Helper function to hash passwords
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-# Create a new user with hashed password
 def create_user(db: Session, user: UserCreate) -> User:
-    hashed_password = get_password_hash(user.password)  # Hash the password
+    hashed_password = get_password_hash(user.password)  
     db_user = User(
         username=user.username,
         email=user.email,
         Dob=user.Dob,
-        hashed_password=hashed_password,  # Save hashed password
+        hashed_password=hashed_password, 
         bio=user.bio,
         profile_picture=user.profile_picture,
     )
@@ -31,20 +29,16 @@ def create_user(db: Session, user: UserCreate) -> User:
     db.refresh(db_user)
     return db_user
 
-# Get a user by ID
 def get_user(db: Session, user_id: int) -> Optional[User]:
     return db.query(User).filter(User.id == user_id).first()
 
-# Get all users
 def get_all_users(db: Session):
     return db.query(User).all()
 
-# Update a user
 def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[User]:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return None
-    # Update fields if new data is provided
     if user_update.username is not None:
         user.username = user_update.username
     if user_update.email is not None:
@@ -59,7 +53,6 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[
     db.refresh(user)
     return user
 
-# Delete a user by ID
 def delete_user(db: Session, user_id: int) -> bool:
     user = get_user(db, user_id)
     if user:
@@ -69,12 +62,11 @@ def delete_user(db: Session, user_id: int) -> bool:
     return False
 
 def follow_user(db: Session, current_user_id: int, user_to_follow_id: int):
-    # Check if the user is already following the target user
     stmt = select(followers).filter(
         followers.c.follower_id == current_user_id,
         followers.c.following_id == user_to_follow_id
     )
-    existing_follow = db.execute(stmt).first()  # Executes the query and checks if already following
+    existing_follow = db.execute(stmt).first() 
     if existing_follow:
         return {"message": "You are already following this user."}
     
@@ -83,7 +75,6 @@ def follow_user(db: Session, current_user_id: int, user_to_follow_id: int):
         return {"message": "The user you are trying to follow does not exist."}
 
 
-    # If not already following, insert the new follow relationship
     insert_stmt = followers.insert().values(follower_id=current_user_id, following_id=user_to_follow_id)
     db.execute(insert_stmt)
     db.commit()
