@@ -1,5 +1,5 @@
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import jwt
 from datetime import datetime, timedelta
@@ -7,8 +7,7 @@ from app.models.Users import User
 from app.database import get_db 
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+security = HTTPBearer()
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -24,7 +23,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 def verify_token(db: Session, token: str) -> User:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub") 
+        user_id: int = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
         
@@ -36,6 +35,5 @@ def verify_token(db: Session, token: str) -> User:
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
 
-
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
-    return verify_token(db=db, token=token)
+def get_current_user(db: Session = Depends(get_db), token: HTTPAuthorizationCredentials = Depends(security)) -> User:
+    return verify_token(db=db, token=token.credentials)
