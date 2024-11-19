@@ -19,6 +19,5 @@ class PostResponse(PostBase):
     class Config:
         orm_mode = True
 
-# Schema for post with comments (optional)
 class PostWithComments(PostResponse):
     comments: List["CommentResponse"] = []

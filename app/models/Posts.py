@@ -12,6 +12,5 @@ class Post(Base):
     image_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    # Relationships
     user = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="post")
