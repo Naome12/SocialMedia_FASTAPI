@@ -24,3 +24,4 @@ def login_for_access_token(db: Session, form_data:UserLogin):
     user = authenticate_user(db, form_data.username, form_data.password)
     access_token = create_access_token(data={"sub": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
