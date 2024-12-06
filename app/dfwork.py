@@ -33,29 +33,24 @@ try:
     )
 
     # Task 1: Return 500,000 rows in your dataset
-    # Expand dataset by duplicating rows until it has 500,000 rows
     while len(inner_merged_df) < 500000:
         inner_merged_df = pd.concat([inner_merged_df, inner_merged_df.sample(len(inner_merged_df))], ignore_index=True)
     inner_merged_df = inner_merged_df[:500000]
 
     # Task 2: Describe your dataset
-    # Display dataset information and summary
     print("Dataset Information:")
     print(inner_merged_df.info())
     print("\nDataset Description:")
     print(inner_merged_df.describe(include='all'))
 
     # Task 3: Find and replace null values
-    # Replace null values with 'Unknown'
     inner_merged_df.fillna("Unknown", inplace=True)
 
     # Task 4: Perform basic data preprocessing
-    # Ensure usernames and other text columns are not encoded
     for col in ['username', 'email', 'content', 'bio']:
         if col in inner_merged_df.columns:
             inner_merged_df[col] = inner_merged_df[col].astype(str)
 
-    # Replace newlines in text columns to ensure each row is on one line
     for col in ['content', 'bio']:
         if col in inner_merged_df.columns:
             inner_merged_df[col] = inner_merged_df[col].str.replace('\n', ' ', regex=True)
@@ -80,18 +75,17 @@ try:
         inner_merged_df["Month of Birth"] = inner_merged_df["Dob"].dt.month
         inner_merged_df["Day of Week"] = inner_merged_df["Dob"].dt.dayofweek
 
-    # Task 6: Apply one-hot encoding
-    # One-hot encode 'Age Group', 'Month of Birth', and 'gender' (if it exists)
-    categorical_columns = ["Age Group", "Month of Birth", "gender"]
-    for col in categorical_columns:
-        if col in inner_merged_df.columns:
-            one_hot = pd.get_dummies(inner_merged_df[col], prefix=col)
-            inner_merged_df = pd.concat([inner_merged_df, one_hot], axis=1)
-            inner_merged_df.drop(columns=[col], inplace=True)
+         #Applying one-hot encoding
+        categorical_columns = ["Age Group", "Month of Birth"]
+        for col in categorical_columns:
+            if col in inner_merged_df.columns:
+                one_hot = pd.get_dummies(inner_merged_df[col], prefix=col)
+                inner_merged_df = pd.concat([inner_merged_df, one_hot], axis=1)
+                inner_merged_df.drop(columns=[col], inplace=True)
 
     # Save final dataset to CSV (avoid multiline rows)
-    inner_merged_df.to_csv("merged_dataset_cleaned.csv", index=False, quoting=1)  # quoting=1 ensures quotes around text fields
-    print("\nMerged dataset saved as 'merged_dataset_cleaned.csv'.")
+    inner_merged_df.to_csv("merged_dataset.csv", index=False, quoting=1) 
+    print("\nMerged dataset saved as 'merged_dataset.csv'.")
 
 except requests.exceptions.RequestException as e:
     print(f"Error fetching data from API: {e}")
