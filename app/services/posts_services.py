@@ -18,12 +18,21 @@ def get_post(db: Session, post_id: int) -> Optional[Post]:
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+<<<<<<< HEAD
 def get_posts(db: Session, user_id: Optional[int] = None) -> List[Post]:
+=======
+def get_posts(db: Session, skip: int = 0, limit: int = 10, user_id: Optional[int] = None) -> List[Post]:
+>>>>>>> d4061cb347e2ed1b6ccb7276cff454b7ad4d7073
     try:
         query = db.query(Post).options(joinedload(Post.user))
         if user_id is not None:
             query = query.filter(Post.user_id == user_id)
+<<<<<<< HEAD
         return query
+=======
+        posts = query.offset(skip).limit(limit).all()
+        return posts
+>>>>>>> d4061cb347e2ed1b6ccb7276cff454b7ad4d7073
     except Exception as e:
         logger.error(f"Error retrieving posts: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
